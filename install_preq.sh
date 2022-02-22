@@ -86,6 +86,7 @@ function install_pip_dependencies() {
     pip install numpy
 }
 
+sudo apt-get update
 install_behavioral_model
 install_pip_dependencies
 
