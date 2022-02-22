@@ -8,6 +8,25 @@ This repository gives the sample code to run and test PINT on Mininet.
 3. scapy (pip install scapy)
 4. numpy (pip install numpy)
 
+## Installation
+1. Download the 18.04 VM of Mininet
+2. Extend the virtual drive of the VM to a bigger size (i.e 20GB). On Virtualbox, enter File -> Virtual Media Manager -> On hard-disks tab (the default tab) change the size of the relevant VDI file.
+3. Extend the size of the filesystem in the VM itself:
+
+    3.1 Install parted using apt - `sudo apt install parted`
+    3.2 Use parted with root user - `sudo parted`
+    3.3 List all partitions using `print all`
+    3.4 Find the `ext4` partition (suppose to be /dev/sda5), and the "extended" partition (/dev/sda2).
+    3.5 Resize the partitions (first the **extended** and only then the ext4) using `resizepart` - choose the partition number as listed in the print output, and then choose the end sector to be 20000 (20GB)
+    3.6 Exit the parted utility (using Ctrl+C)
+    3.7 Resize the ext4 filesystem using `sudo resize2fs /dev/sda5` (assuming it is on /dev/sda5).
+4. Install the requirements:
+
+    4.1 Install nanomsg
+    4.2 Install thrift
+    4.3 Install behavioral model v2
+    4.4 Install the pip requirements (networkx, scapy, numpy)
+
 ## Steps to run PINT
 - Create topology.
 
