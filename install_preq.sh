@@ -4,6 +4,7 @@ BYellow='\033[1;33m'
 BCyan='\033[1;36m'
 BPurple='\033[1;35m'
 Reset_all='\033[0m'
+WORKING_DIR=$(pwd)
 
 function install_nanomsg() {
     echo -e "${BCyan}Cloning into nanomsg${Reset_all}"
@@ -25,6 +26,7 @@ function install_nanomsg() {
     set -x
     sudo cmake --build . --target install
     sudo ldconfig
+    cd $WORKING_DIR
     set +x
 }
 
@@ -46,6 +48,7 @@ function install_thrift() {
     echo -e "${BYellow}Making thrift${Reset_all}"
     make
     sudo make install
+    cd $WORKING_DIR
 }
 
 function install_behavioral_model() {
