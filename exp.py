@@ -4,8 +4,8 @@ import time
 import sys
 import networkx as nx
 
-from p4utils.utils.topology import Topology
-
+from p4utils.utils.topology import *
+from p4utils.utils.helper import *
 
 class Experiment:
 	def __init__(
@@ -47,23 +47,24 @@ class Experiment:
 			self.G.add_edge(node_1,node_2)
 
 	def obtain_mininet_topo(self):
-		topo = Topology(db="topology.db")
+		topo = load_topo('topology.json')
 		for switch in self.all_switches:
 			if switch not in self.switch_mapper:
 					self.switch_mapper[switch]={}
 
 			host=switch.replace("s","h")
-			host_details=topo.node(host)
-			ip_address=host_details[switch]["ip"].split("/")[0]
+		#	host_details=topo.node(host)
+			ip_address=topo.get_host_ip(host)
 			self.host_ips[host]=ip_address
 
-			switch_details=topo.node(switch)
-			self.thrift_port[switch]=switch_details["thrift_port"]
+			#switch_details=topo.node(switch)
+			self.thrift_port[switch]= topo.get_thrift_port(switch) # switch_details["thrift_port"]
 
-			for interface,port in switch_details["interfaces_to_port"].iteritems():
+			for interface in topo.get_interfaces(switch):
+                            # switch_details["interfaces_to_port"].iteritems():
 				if interface!="lo":
-					node=switch_details["interfaces_to_node"][interface]
-					self.switch_mapper[switch][node]=port
+					node=topo.interface_to_node(switch, interface)  # switch_details["interfaces_to_node"][interface]
+					self.switch_mapper[switch][node]=topo.interface_to_port(switch, interface)
 
 
 	def generate_rules(self):
@@ -97,7 +98,7 @@ class Experiment:
 					ttl=ttl-1
 			fw.close()
 
-		for node,port in self.thrift_port.iteritems():
+		for node,port in self.thrift_port:#.iteritems():
 			os.system("simple_switch_CLI --thrift-port "
 			+str(port)+" < rules/"+str(node)
 			+"-commands.txt > /dev/null")
@@ -160,7 +161,7 @@ class Experiment:
 
 					os.system("sudo pkill -9 -f recv.py")
 					self.exp_count=self.exp_count+1
-					print "Exp range",exp_range,"Total runs",str(self.exp_count)+"/"+str(exp_range-1)+" Time",time.time()-start_time
+					print(f"Exp range {exp_range}, Total runs ,{str(self.exp_count)}/{+str(exp_range-1)} Time {time.time()-start_time}")
 					total_runs=total_runs-1
 				if total_runs==1:
 					self.all_done.add(exp_range)
